@@ -2,8 +2,10 @@ object ListsPractice {
   val x = 1 :: 2 :: 3 :: 4 :: Nil
 
   def main(args: Array[String]) {   
-    println("value of x: ")
-    println(x)
+    //println("value of x: ")
+    //println(x)
+    //println(removeIndex(2, x))
+    println(countEvens(x))
   }
   
   // given an upper and lower boundm returns the list of primes within the bounds
@@ -32,17 +34,17 @@ object ListsPractice {
     (list foldRight List[Int] ())((x, list) => x :: x :: list)    
 
   // given an index and a list, removes the element at the index
-  def removeAt(index: Int, list: List[Int]): (List[Int], Int) = list match{
-    case Nil => (Nil, index)
-    case x :: xs => if (x == index + 1) (list.tail, index) else {
-        var tuple = removeAt(index, list.tail)
-        (x :: tuple._1, index)
-      }
+  def removeIndex(index: Int, list: List[Int]): (List[Int], Int) = {
+    if (list.isEmpty) throw new IndexOutOfBoundsException
+    else if (index == 0) (list.tail, index)
+    else { var tuple = removeIndex(index - 1, list.tail)
+      (list.head :: tuple._1, tuple._2 + 1)
+    }
   }
   
   // counts the number of evens in a given list
   def countEvens(list: List[Int]): Int = {
-    list.foldLeft(0)((count, x) => if (x % 2 == 0) count + 1 else count)
+    list.foldRight(0)((x, count) => if (x % 2 == 0) count + 1 else count)
   }
   
   // removes every other element in a list
@@ -75,4 +77,6 @@ object ListsPractice {
     else Nil
   } 
 }
+
+
 
