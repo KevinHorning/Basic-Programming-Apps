@@ -2,7 +2,7 @@
 
 /* Regristration: creates a new row in person table */
 INSERT INTO Person (personID, username, password, nickname, email, accountCreatedDate) 
-    VALUES (currentKey, 'username', 'password', 'nickname', 'sampleaddress@gmail.com', 'datetime of creation');
+    VALUES (7, 'username', 'password', 'nickname', 'sampleaddress@gmail.com', 'datetime of creation');
 
 /* Login: verifies that there is a row in Person table with the given credentials */
 SELECT * FROM Person WHERE username = 'username' AND password = 'password';
@@ -11,9 +11,6 @@ SELECT * FROM Person WHERE username = 'username' AND password = 'password';
 INSERT INTO Activity (activityID, categoryID, activityName, isGroupActivity) 
     VALUES (currentKey, 'inputCategoryID', 'inputActivityName', 1);
 INSERT INTO `Person-Activity` (`person-activityID`, personID, activityID) VALUES (currentID+1, personID, activityID);
-
-/* Get Activities: gets the names of all activities when a user selects their category */
-SELECT activityName FROM Activity WHERE activityName = 'inputActivityName';
 
 /* Session Storing: creates a row in the session table when a session is completed */
 INSERT INTO Session (sessionID, syncedSessionID, `person-activityID`, startTime, endTime, focusIntervalLength, breakIntervalLength, numberCycles) 
@@ -36,6 +33,36 @@ INSERT INTO Session (sessionID, syncedSessionID, `person-activityID`, startTime,
 /* Sending a Message: creates a row in the Message table */
 INSERT INTO ChatMessage (messageID, `person-groupChatID`, messageContent, sentTime) VALUES (1, 1, 'u finish the portrait page yet?', '2020-04-18 16:02:41');
 
-/* Change Category Name: modifies the name of a category*/
-UPDATE Category SET categoryName = 'inputName' WHERE categoryID = inputID;
+
+/* Creates a new user */
+INSERT INTO Person (personID, username, password, nickname, email, accountCreatedDate) 
+    VALUES (7, 'username', 'password', 'nickname', 'sampleaddress@gmail.com', 'datetime of creation');
+
+/* Edits the name of a category */
+UPDATE Category SET categoryName = 'inputName' WHERE categoryID = 1;
+
+/* Gets all activities under a category */
+SELECT activityName FROM Activity AS A, Category AS C 
+    WHERE A.categoryID = C.categoryID AND categoryName = 'inputName';
+
+/* Gets the number of sessions a user has had */
+SELECT COUNT(numberCycles) FROM (SELECT personID, numberCycles FROM `Person-Activity` AS PA, Session AS S
+    WHERE PA.`person-activityID` = S.`person-activityID`) TABLE1 WHERE personID = 1;
+
+/* Gets total number of cycles completed by a user */
+SELECT SUM(numberCycles) FROM (SELECT personID, numberCycles FROM `Person-Activity` AS PA, Session AS S 
+    WHERE PA.`person-activityID` = S.`person-activityID`) TABLE1;
+
+/* Gets most recent activity of a specific user */
+SELECT activityName FROM (
+    SELECT activityName, endTime FROM `Person-Activity` AS PA, Session AS S, Activity AS A
+        WHERE PA.`person-activityID` = S.`person-activityID` AND PA.activityID = A.activityID AND PA.personID = 5
+        ORDER BY endTime DESC) TABLE1 
+    LIMIT 1;
+
+/* Searches a string in a user's messages */
+SELECT messageContent FROM (
+    SELECT messageContent FROM ChatMessage AS CM, `Person-GroupChat` AS PGC 
+        WHERE CM.`person-groupChatID` = PGC.`person-groupChatID` AND PGC.personID = 1) TABLE1 
+    WHERE messageContent LIKE '%page%';
 
